@@ -175,6 +175,9 @@ int transform_image(const char *input_filename, const char *output_filename) {
   const unsigned int quotient = decompressor.image_height / NUM_THREADS;
   const unsigned int remainder = decompressor.image_height % NUM_THREADS;
 
+  struct timespec start, end;
+  timespec_get(&start, TIME_UTC);
+
   for (size_t i = 0; i < NUM_THREADS; i++) {
     const unsigned long int worker_quotient = (i < remainder) ? (quotient + 1) : (quotient);
     struct transform_row_params *params = (struct transform_row_params *)&all_buffer[
@@ -195,6 +198,10 @@ int transform_image(const char *input_filename, const char *output_filename) {
   for (size_t i = 0; i < NUM_THREADS; i++) {
     (void)pthread_join(thread_ids[i], NULL);
   }
+
+  timespec_get(&end, TIME_UTC);
+  unsigned long int time_in_nano_seconds = (end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec);
+  printf("%lu\n", time_in_nano_seconds);
 
   for (size_t i = 0; i < compressor.image_height; i++) {
     (void)jpeg_write_scanlines(&compressor, &output_rows_buffer[i], 1);

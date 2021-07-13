@@ -7,6 +7,7 @@ pio.kaleido.scope.default_width = 700 * 2
 pio.kaleido.scope.default_height = 500 * 2
 
 df = pd.read_csv("./benchmark.csv")
+df['time'] = df['time'] * 1e-9
 
 fig = px.line(
     df,
